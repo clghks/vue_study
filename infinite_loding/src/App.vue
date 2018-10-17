@@ -1,6 +1,9 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
+    <router-link to="/">Home</router-link>
+    <router-link to="/HackerNewsList">HackerNewsList</router-link>
+    <router-link to="/UseWithFilter">UseWithFilter</router-link>
+    <router-link to="/TriggerManually">TriggerManually</router-link>
     <router-view/>
   </div>
 </template>

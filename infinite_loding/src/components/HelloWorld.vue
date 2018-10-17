@@ -1,113 +1,90 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <h2>Essential Links</h2>
-    <ul>
-      <li>
-        <a
-          href="https://vuejs.org"
-          target="_blank"
-        >
-          Core Docs
+  <div>
+    <div class="hacker-news-list"> 
+      <div class="hacker-news-header">
+        <a target="_blank" href="http://www.ycombinator.com/">
+        <img src="https://news.ycombinator.com/y18.gif">
         </a>
-      </li>
-      <li>
-        <a
-          href="https://forum.vuejs.org"
-          target="_blank"
-        >
-          Forum
-        </a>
-      </li>
-      <li>
-        <a
-          href="https://chat.vuejs.org"
-          target="_blank"
-        >
-          Community Chat
-        </a>
-      </li>
-      <li>
-        <a
-          href="https://twitter.com/vuejs"
-          target="_blank"
-        >
-          Twitter
-        </a>
-      </li>
-      <br>
-      <li>
-        <a
-          href="http://vuejs-templates.github.io/webpack/"
-          target="_blank"
-        >
-          Docs for This Template
-        </a>
-      </li>
-    </ul>
-    <h2>Ecosystem</h2>
-    <ul>
-      <li>
-        <a
-          href="http://router.vuejs.org/"
-          target="_blank"
-        >
-          vue-router
-        </a>
-      </li>
-      <li>
-        <a
-          href="http://vuex.vuejs.org/"
-          target="_blank"
-        >
-          vuex
-        </a>
-      </li>
-      <li>
-        <a
-          href="http://vue-loader.vuejs.org/"
-          target="_blank"
-        >
-          vue-loader
-        </a>
-      </li>
-      <li>
-        <a
-          href="https://github.com/vuejs/awesome-vue"
-          target="_blank"
-        >
-          awesome-vue
-        </a>
-      </li>
-    </ul>
+        <span>Hacker News</span>
+      </div>
+      <div class="hacker-news-item" v-for="(item, key) in list" v-bind:key="item">
+        <span class="num" v-text="key + 1"></span>
+        <a target="_blank" :href="item.url" v-text="item.title"></a>
+        <p>
+        <small>
+            <span v-text="item.points"></span>
+            points by
+            <a target="_blank" :href="'https://news.ycombinator.com/user?id=' + item.author" v-text="item.author"></a>
+            |
+            <a target="_blank" :href="'https://news.ycombinator.com/item?id=' + item.objectID" v-text="item.num_comments + ' comments'"></a>
+        </small>
+        </p>
+      </div>
+    </div>
+
+    <button class="btn-load-more" v-show="distance < maxCount" @click="manualLoad">Load more</button>
+    <infinite-loading @infinite="infiniteHandler" ref="infiniteLoading">
+        <span slot="no-more">
+        There is no more Hacker News :(
+        </span>
+        <span slot="no-results">
+        There is no results Hacker News :(
+        </span>
+    </infinite-loading>
   </div>
 </template>
 
 <script>
+import InfiniteLoading from 'vue-infinite-loading'
+import axios from 'axios';
+
+const api = 'http://hn.algolia.com/api/v1/search_by_date?tags=story';
+
 export default {
-  name: 'HelloWorld',
-  data () {
+  data() { 
     return {
-      msg: 'Welcome to Your Vue.js App'
+      list: [],
+      apiItemList: [],
+      distance: 3,
+      pageCount: 3,
+      maxCount: 10
     }
+  },
+  created () {
+    axios.get(api, {
+      params: {
+          page: 1,
+        },
+      }).then(({ data }) => {
+        this.apiItemList = data.hits;
+        for (let i = 0; i < this.pageCount; i++) {
+          this.list.push(this.apiItemList[i])
+        }
+        this.$refs.infiniteLoading.loaded()
+        this.$refs.infiniteLoading.complete()
+      });
+  },
+  methods: {
+    infiniteHandler(state) {
+    },
+    manualLoad() {      
+      this.distance = this.distance + this.pageCount;
+      const temp = []
+      const itemCount = this.list.length + this.pageCount
+      for (let i = this.list.length + 1; i <= (itemCount > this.maxCount ? this.maxCount : itemCount); i++) {
+        temp.push(this.apiItemList[i])
+      }
+      this.list = this.list.concat(temp)
+      if (this.list.length > this.maxCount) {
+        this.$refs.infiniteLoading.complete();
+      } else {
+        this.$refs.infiniteLoading.attemptLoad();
+      }
+
+    }
+  },
+  components: {
+    InfiniteLoading
   }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h1, h2 {
-  font-weight: normal;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-</style>

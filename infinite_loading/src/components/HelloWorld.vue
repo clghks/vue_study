@@ -24,12 +24,8 @@
 
     <button class="btn-load-more" v-show="distance < maxCount" @click="manualLoad">Load more</button>
     <infinite-loading @infinite="infiniteHandler" ref="infiniteLoading">
-        <span slot="no-more">
-        There is no more Hacker News :(
-        </span>
-        <span slot="no-results">
-        There is no results Hacker News :(
-        </span>
+        <span slot="no-more"/>
+        <span slot="no-results"/>
     </infinite-loading>
   </div>
 </template>
@@ -60,12 +56,11 @@ export default {
         for (let i = 0; i < this.pageCount; i++) {
           this.list.push(this.apiItemList[i])
         }
-        this.$refs.infiniteLoading.loaded()
-        this.$refs.infiniteLoading.complete()
       });
   },
   methods: {
     infiniteHandler(state) {
+      state.complete()
     },
     manualLoad() {      
       this.distance = this.distance + this.pageCount;
@@ -75,12 +70,6 @@ export default {
         temp.push(this.apiItemList[i])
       }
       this.list = this.list.concat(temp)
-      if (this.list.length > this.maxCount) {
-        this.$refs.infiniteLoading.complete();
-      } else {
-        this.$refs.infiniteLoading.attemptLoad();
-      }
-
     }
   },
   components: {

@@ -1,6 +1,6 @@
-# infinite_loding
+# infinite_loading
 
-> infinite loding test
+> infinite loading test
 
 ## Build Setup
 

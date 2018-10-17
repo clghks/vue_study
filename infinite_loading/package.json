@@ -1,7 +1,7 @@
 {
-  "name": "infinite_loding",
+  "name": "infinite_lodaing",
   "version": "1.0.0",
-  "description": "infinite loding test",
+  "description": "infinite loading test",
   "author": "Choi Chihwan <clghks@gmail.com>",
   "private": true,
   "scripts": {
